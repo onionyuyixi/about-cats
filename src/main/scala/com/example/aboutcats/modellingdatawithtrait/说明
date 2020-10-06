@@ -1,0 +1,4 @@
+
+特质是一种创建class的模板 以此类推 class是 object的创建模板
+Traits are templates for creating classes, in the same way that classes are templates for creating objects.
+Traits allow us to express that two or more classes can be considered the same, and thus both implement the same operations.

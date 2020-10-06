@@ -1,0 +1,14 @@
+参考书籍《scala with cats》
+
+关于implicit scope的相关参考
+1 http://eed3si9n.com/revisiting-implicits-without-import-tax
+2 https://stackoverflow.com/questions/5598085/where-does-scala-look-for-implicits
+
+That's a lot of information, but the important thing is that an implicit scope consists only of
+companion objects, and that Category 2 is implicit members of those companion objects.
+Note that both the type constructor's companion object and the type parameters' companion object
+are included into implicit scope.
+
+****
+trait or class 可能之间存在继承关系 但是他们对应的companion object不存在对应的关系
+
