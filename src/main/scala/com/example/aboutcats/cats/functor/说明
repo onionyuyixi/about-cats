@@ -1,0 +1,43 @@
+In this chapter we will investigate functors, an abstraction that allows us to
+represent sequences of operations within a context such as a List, an Option,
+or any one of a thousand other possibilities
+
+
+Future
+When we work with a Future we have no guarantees about its internal state.
+The wrapped computation may be ongoing, complete, or rejected. If the
+Future is complete, our mapping function can be called immediately. If not,
+some underlying thread pool queues the function call and comes back to it
+later. We don’t know when our functions will be called, but we do know what
+order they will be called in.In this way, Future provides the same sequencing
+behaviour seen in List, Option, and Either
+
+
+
+Function Composition
+function composition is sequencing. We start with a function
+that performs a single operation and every time we use map we append another operation to the chain.
+Calling map doesn’t actually run any of the operations, but if we can pass an argument
+to the final function all of the operations are run in sequence.
+We can think of this as lazily queueing up operations similar to Future
+
+
+
+TYPE CONSTRUCTORS and HIGHER KINDED TYPES.
+
+We distinguish between regular types that have no holes and “type constructors”
+that have holes we can fill to produce types
+
+regular types  需要指定type即可 List[A]  type, produced by applying a type parameter
+type constructors 有参数来自动判断type List  type constructor, takes one parameter
+
+
+There’s a close analogy here with functions and values.
+Functions are “value constructors”—they produce values when we supply parameters
+math.abs // function, takes one parameter
+math.abs(x) // value, produced by applying a value parameter
+
+
+In Scala we declare type constructors using underscores
+
+
