@@ -55,6 +55,19 @@ object ImplicitMethod extends App {
   //by defining implicit methods to construct instances from other type class instances.
   //也可以用一下Interface Syntax(enrichment type)来实现
   //可以说二者在功能上是等同的
+  //二者的转换可以这样来实现 在确定了type（作为基础type implicit method 生成的type class instance 是具体的type）之后
+  // 将implicit method封装到implicit class之中
+  // 将implicit method构造type class instance的具体type 作为构造器的唯一参数
+  //这样就可以解释的通 用implicit method 实现 construct instance的目的
+  //我们可以这样认为 class 是许多instance 的抽象
+  // 这里new OptJsonWriterOps(option) 用函数的观点来说则是 Option[A]=>由OptJsonWriterOps推演出的一个instance
+  // 同时这个instance里封装了type class的实例
+  // 而 implicit def implicitOptionWriter[A](implicit writer: JsonWriter[A]): JsonWriter[Option[A]] =
+  //    (option: Option[A]) => option match {
+  //      case Some(value) => writer.write(value)
+  //      case None => JsNull
+  //    }
+  // 不也是Option[A]=>type class的一个实例吗?? 殊途同归
   implicit class OptJsonWriterOps[A](option: Option[A]) {
     def toJson(implicit writer: JsonWriter[A]): Json = option match {
       case Some(value) => writer.write(value)

@@ -58,9 +58,13 @@ object CatFunctor extends App {
   println(Functor[List].as(List(1, 2, 3), "xi") == List("xi", "xi", "xi")) //true 意在覆盖 替代
 
   //以下部分 使用functor ---type constructor实例
-  def doMath[F[_]](start: F[Int])(implicit functor: Functor[F]): F[Int] = functor.map(start)(_+2)
 
-  //def doMath方法 非常类似type class 中的 implicit method 
+
+  //def doMath方法 非常类似type class 中的 implicit method
+  def doMath[F[_]](start: F[Int])(implicit functor: Functor[F]): F[Int]
+  = functor.map(start)(_ + 2) // 也等同于 start map (_+2)
+
+  //同样implicit method doMath 也可以用enrichment type的方式来替代
   implicit class DoMath[F[_], A](src: F[A]) {
     def doMath[B](func: A => B)(implicit functor: Functor[F]): F[B] = functor.map(src)(func)
   }
@@ -114,7 +118,52 @@ object CatFunctor extends App {
     override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa map f
   }
 
+  //Contravariant and Invariant Functors
 
+  /*
+  As we have seen, we can think of Functor's map method as “appending” a
+  transformation to a chain. We’re now going to look at two other type classes,
+  one representing prepending operations to a chain, and one representing build‐
+  ing a bidirectional chain of operations. These are called contravariant and invari‐
+  ant functors respectively.
+   */
+  //余案  A B 之间的关系有三种
+  // A=>B B=>A (这都是单向操作) 还有A<=>B（双向操作）
+  // 单向操作A=>B(appending operation 后置操作) B=>A(prepending operation 前置操作)
+
+
+  //Contravariant Functors ---->contraMap
+  trait ContraTrait[A] {
+
+    def value(a: A): String
+
+    //相当于通过依赖自己实现反转关系
+    // 一定要有一个类似构造器的方法(这里的value即是) trait无法自带构造器 故而弥补
+    def contraMap[B](f: B => A): ContraTrait[B] = (a: B) => value(f(a))
+  }
+
+  def value[A](a: A)(implicit contraTrait: ContraTrait[A]) = contraTrait.value(a)
+
+  implicit val stringPrintable: ContraTrait[String] =
+    (value: String) => s"'${value}'"
+  implicit val booleanPrintable: ContraTrait[Boolean] =
+    (a: Boolean) => if (a) "yes" else "no"
+
+  println(value("123"))
+  println(value(true))
+
+  final case class Box[A](value: A)
+
+  implicit def boxMethod[A](implicit contraTrait: ContraTrait[A]): ContraTrait[Box[A]] =
+    (a: Box[A]) => contraTrait.value(a.value)
+
+
+  implicit class BoxMethodClass[A](ba: Box[A]) {
+    def boxMethod(implicit contraTrait: ContraTrait[A]):String = contraTrait.value(ba.value)
+  }
+
+
+  Box("123").boxMethod
 }
 
 trait MyList[A] {
@@ -126,3 +175,16 @@ case class MyIntList[Int](ints: List[Int]) extends MyList[Int] {
 
 case class MyStrList[String](strs: List[String]) extends MyList[String] {
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
