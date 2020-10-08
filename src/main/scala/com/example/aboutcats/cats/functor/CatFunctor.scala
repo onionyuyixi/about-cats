@@ -159,11 +159,12 @@ object CatFunctor extends App {
 
 
   implicit class BoxMethodClass[A](ba: Box[A]) {
-    def boxMethod(implicit contraTrait: ContraTrait[A]):String = contraTrait.value(ba.value)
+    def boxMethod(implicit contraTrait: ContraTrait[A]): String = contraTrait.value(ba.value)
   }
 
+  value(Box("123")) // 采用的便是 implicit def boxMethod
+  Box("123").boxMethod // 采用的便是 implicit class BoxMethodClass
 
-  Box("123").boxMethod
 }
 
 trait MyList[A] {
